@@ -1,0 +1,8 @@
+/* Remove details marker */
+details > summary {
+  list-style: none;
+}
+::marker,
+::-webkit-details-marker {
+  display: none;
+}

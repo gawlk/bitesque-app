@@ -1,0 +1,44 @@
+@font-face {
+  font-family: 'Druk X';
+  src: url('/fonts/DrukX.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter var';
+  src: url('/fonts/Inter.var.woff2') format('woff2');
+  font-weight: 100 900;
+
+  /* To add if font supports both italic and non-italic styles */
+  font-style: oblique 0deg 10deg;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lexend var';
+  src: url('/fonts/Lexend.var.woff2') format('woff2');
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: 'LexendDeca var';
+  src: url('/fonts/LexendDeca.var.ttf') format('truetype');
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: 'Outfit var';
+  src: url('/fonts/Outfit.var.woff2') format('woff2');
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: 'PlusJakartaSans var';
+  src: url('/fonts/PlusJakartaSans.var.ttf') format('truetype');
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: 'WorkSans var';
+  src: url('/fonts/WorkSans.var.ttf') format('truetype');
+  font-weight: 100 900;
+}
