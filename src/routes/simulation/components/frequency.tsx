@@ -9,7 +9,7 @@ import { DialogSelect, Section } from '/src/components'
 
 interface FrequencyOption {
   value: string | number
-  label: string
+  text: string
   isDateAConversionDay: IsDateAConversionDay
 }
 
@@ -29,21 +29,20 @@ export default (props: Props) => {
   const timeFrames = [
     {
       value: 'daily',
-      label: 'Every day',
+      text: 'Every day',
     },
     {
       value: 'weekly',
-      label: 'Every week',
+      text: 'Every week',
       options: {
         selectableList: createSelectableList(
-          weekDays.map((label, value): FrequencyOption => {
+          weekDays.map((text, value): FrequencyOption => {
             value++
 
             return {
               value,
-              label,
-              isDateAConversionDay: (date) =>
-                label === getWeekDayFromDate(date),
+              text,
+              isDateAConversionDay: (date) => text === getWeekDayFromDate(date),
             }
           })
         ),
@@ -63,7 +62,7 @@ export default (props: Props) => {
 
               return {
                 value: `${day1}+${day2}`,
-                label: `The ${getOrdinalDayFromDayNumber(
+                text: `The ${getOrdinalDayFromDayNumber(
                   day1
                 )} and the ${getOrdinalDayFromDayNumber(day2)}`,
                 isDateAConversionDay: (date) => {
@@ -86,7 +85,7 @@ export default (props: Props) => {
 
             return {
               value: day,
-              label: `The ${getOrdinalDayFromDayNumber(day)}`,
+              text: `The ${getOrdinalDayFromDayNumber(day)}`,
               isDateAConversionDay: (date) => day === date.getUTCDate(),
             }
           })
@@ -125,11 +124,11 @@ export default (props: Props) => {
             full: true,
           }}
           title="Select a frequency"
-          list={{
+          options={{
             selected: state.selected?.value || '',
-            values: state.list.map((timeFrame) => ({
+            list: state.list.map((timeFrame) => ({
               value: timeFrame.value,
-              label: timeFrame.label,
+              text: timeFrame.label,
             })),
           }}
           onClose={(value?: string) =>
@@ -141,38 +140,37 @@ export default (props: Props) => {
           }
         />
         <Show when={state.selected?.options}>
-          <DialogSelect
-            id={`${id}-option`}
-            button={{
-              leftIcon: IconTablerAlarm,
-              label: state.selected?.options?.buttonLabel || 'Day',
-              text: state.selected?.options?.selectableList.selected?.label,
-              full: true,
-            }}
-            title={state.selected?.options?.dialogTitle || `Select a day`}
-            list={{
-              selected: String(
-                state.selected?.options?.selectableList.selected?.value
-              ),
-              values:
-                state.selected?.options?.selectableList.list.map((option) => ({
-                  value: String(option.value),
-                  label: option.label,
-                })) || [],
-            }}
-            onClose={(value?: string) => {
-              const selectedOption =
-                state.selected?.options?.selectableList.list?.find(
+          {(options) => (
+            <DialogSelect
+              id={`${id}-option`}
+              button={{
+                leftIcon: IconTablerAlarm,
+                label: options().buttonLabel || 'Day',
+                text: options().selectableList.selected?.text,
+                full: true,
+              }}
+              title={options().dialogTitle || `Select a day`}
+              options={{
+                selected: String(options().selectableList.selected?.value),
+                list:
+                  options().selectableList.list.map((option) => ({
+                    value: String(option.value),
+                    text: option.text,
+                  })) || [],
+              }}
+              onClose={(value?: string) => {
+                const selectedOption = options().selectableList.list?.find(
                   (option) => option.value == value
                 )
 
-              if (selectedOption) {
-                setState('selected', 'options', 'selectableList', {
-                  selected: selectedOption,
-                })
-              }
-            }}
-          />
+                if (selectedOption) {
+                  setState('selected', 'options', 'selectableList', {
+                    selected: selectedOption,
+                  })
+                }
+              }}
+            />
+          )}
         </Show>
       </div>
     </Section>

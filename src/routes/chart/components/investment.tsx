@@ -41,10 +41,10 @@ export default (props: Props) => {
 
         createEffect(
           on(
-            () => store.percentageRatio,
-            (percentageRatio) =>
+            () => store.ratios,
+            (ratios) =>
               series.setData(
-                percentageRatio.map((data, index) => {
+                ratios.map((data, index) => {
                   const { time, color } = unwrap(data)
 
                   return {

@@ -19,7 +19,9 @@ export default defineConfig({
       // islands: true,
       // islandsRouter: true,
       // https://github.com/solidjs/solid-hackernews/tree/netlify/src
-      adapter: netlify({ edge: true }),
+      adapter: netlify({
+        // edge: true,
+      }),
     }),
 
     solidSvg(),

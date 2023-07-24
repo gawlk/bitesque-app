@@ -33,12 +33,12 @@ export default (props: Props) => {
           search={{
             placeholder: 'Currency',
           }}
-          list={{
+          options={{
             selected: props.currency.symbol,
-            values: currencies.map((currency) => ({
+            list: currencies.map((currency) => ({
               icon: currency.icon,
               value: currency.symbol,
-              label: () => <SpanCurrency currency={currency} />,
+              text: () => <SpanCurrency currency={currency} />,
             })),
           }}
           onClose={(value?: string) => props.setter('currency', value)}

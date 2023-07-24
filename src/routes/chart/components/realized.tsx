@@ -4,7 +4,7 @@ import { store } from '/src/store'
 
 import { colors, mixColors } from '/src/scripts'
 
-import { defaultLineOptions } from './scripts'
+import { defaultChartLineOptionsWithAutoscale } from './scripts'
 
 interface Props {
   chart: LightweightCharts.IChartApi | null
@@ -19,7 +19,7 @@ export default (props: Props) => {
         if (!chart) return
 
         const seriesOptions: Parameters<typeof chart.addLineSeries>[0] = {
-          ...defaultLineOptions,
+          ...defaultChartLineOptionsWithAutoscale,
           color: mixColors(colors.black, colors.orange),
         }
 
@@ -34,7 +34,7 @@ export default (props: Props) => {
         })
 
         createEffect(() =>
-          series.setData(store.realizedPrice.map((v) => unwrap(v)))
+          series.setData(store.realizedPrices.map((v) => unwrap(v)))
         )
       }
     )

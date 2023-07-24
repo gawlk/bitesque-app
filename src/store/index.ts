@@ -6,14 +6,14 @@ import { fetchCandlesticks, lookIntoBitcoinFetcher } from './scripts'
 
 export const [store, setStore] = createStore({
   candlesticks: [] as CandlestickDataWithVolume[],
-  realizedPrice: [] as LightweightCharts.SingleValueData[],
-  balancedPrice: [] as LightweightCharts.SingleValueData[],
-  cvddPrice: [] as LightweightCharts.SingleValueData[],
-  terminalPrice100: [] as LightweightCharts.SingleValueData[],
-  terminalPrice75: [] as LightweightCharts.SingleValueData[],
-  terminalPrice50: [] as LightweightCharts.SingleValueData[],
-  terminalPrice25: [] as LightweightCharts.SingleValueData[],
-  percentageRatio: [] as Required<LightweightCharts.LineData>[],
+  realizedPrices: [] as LightweightCharts.SingleValueData[],
+  balancedPrices: [] as LightweightCharts.SingleValueData[],
+  cvddPrices: [] as LightweightCharts.SingleValueData[],
+  terminal100Prices: [] as LightweightCharts.SingleValueData[],
+  terminal75Prices: [] as LightweightCharts.SingleValueData[],
+  terminal50Prices: [] as LightweightCharts.SingleValueData[],
+  terminal25Prices: [] as LightweightCharts.SingleValueData[],
+  ratios: [] as RatioData[],
   lastCandlestick: null as CandlestickDataWithVolume | null,
   init: async () => {
     console.log('init global store')
@@ -34,19 +34,19 @@ export const [store, setStore] = createStore({
     }[] = [
       {
         fetcherKey: 'fetchRealizedPrice',
-        storeKey: 'realizedPrice',
+        storeKey: 'realizedPrices',
       },
       {
         fetcherKey: 'fetchBalancedPrice',
-        storeKey: 'balancedPrice',
+        storeKey: 'balancedPrices',
       },
       {
         fetcherKey: 'fetchCVDDPrice',
-        storeKey: 'cvddPrice',
+        storeKey: 'cvddPrices',
       },
       {
         fetcherKey: 'fetchTerminalPrice',
-        storeKey: 'terminalPrice100',
+        storeKey: 'terminal100Prices',
       },
     ]
 
@@ -69,29 +69,29 @@ export const [store, setStore] = createStore({
     })
 
     createEffect(() => {
-      const { terminalPrice100 } = store
+      const { terminal100Prices } = store
 
       const parametersList: {
         storeKey: keyof typeof store
         multiplier: number
       }[] = [
         {
-          storeKey: 'terminalPrice75',
+          storeKey: 'terminal75Prices',
           multiplier: 0.75,
         },
         {
-          storeKey: 'terminalPrice50',
+          storeKey: 'terminal50Prices',
           multiplier: 0.5,
         },
         {
-          storeKey: 'terminalPrice25',
+          storeKey: 'terminal25Prices',
           multiplier: 0.25,
         },
       ]
 
       parametersList.forEach((parameters) =>
         setStore({
-          [parameters.storeKey]: terminalPrice100.map((data) => ({
+          [parameters.storeKey]: terminal100Prices.map((data) => ({
             time: data.time,
             value: data.value ? data.value * parameters.multiplier : data.value,
           })),
@@ -101,90 +101,91 @@ export const [store, setStore] = createStore({
 
     createEffect(() => {
       const {
-        realizedPrice,
-        balancedPrice,
-        cvddPrice,
-        terminalPrice100,
-        terminalPrice75,
-        terminalPrice50,
-        terminalPrice25,
+        realizedPrices,
+        balancedPrices,
+        cvddPrices,
+        terminal100Prices,
+        terminal75Prices,
+        terminal50Prices,
+        terminal25Prices,
       } = store
 
       if (
-        !realizedPrice.length ||
-        !balancedPrice.length ||
-        !cvddPrice.length ||
-        !terminalPrice100.length ||
-        !terminalPrice75.length ||
-        !terminalPrice50.length ||
-        !terminalPrice25.length
+        !realizedPrices.length ||
+        !balancedPrices.length ||
+        !cvddPrices.length ||
+        !terminal100Prices.length ||
+        !terminal75Prices.length ||
+        !terminal50Prices.length ||
+        !terminal25Prices.length
       )
         return
 
       untrack(() => {
-        const percentageRatio: typeof store.percentageRatio = []
+        const ratios: typeof store.ratios = []
 
         const colorBuy = colors.sky
-        const colorCaution = colors.yellow
-        const colorSell = colors.orange
-        const colorWait = colors.emerald
 
         let top: number | null = null
 
         candlesticks.slice(0, -1).forEach((candlestick, index) => {
           const { low, high, close } = candlestick
 
-          if (close < realizedPrice[index].value) {
+          if (close < realizedPrices[index].value) {
             top = null
           }
 
-          if (high > terminalPrice100[index].value) {
-            top = terminalPrice100[index].value
+          if (high > terminal100Prices[index].value) {
+            top = terminal100Prices[index].value
           }
 
-          let data: (typeof store.percentageRatio)[number] = {
+          let data: (typeof store.ratios)[number] = {
             time: candlestick.time,
-            value: 1,
+            value: close,
+            cautiousRatio: 0,
+            agressiveRatio: null,
             color: colorBuy,
           }
 
           if (
-            low < cvddPrice[index].value &&
-            low < balancedPrice[index].value
+            low < cvddPrices[index].value &&
+            low < balancedPrices[index].value
           ) {
-            data.value = 1
+            data.cautiousRatio = 12
             data.color = colorBuy
           } else if (
-            low < cvddPrice[index].value ||
-            low < balancedPrice[index].value
+            low < cvddPrices[index].value ||
+            low < balancedPrices[index].value
           ) {
-            data.value = 1
-            data.color = mixColors(colors.black, colorBuy, 0.75)
-          } else if (low < realizedPrice[index].value) {
-            data.value = 1
+            data.cautiousRatio = 6
+            data.color = mixColors(colors.black, colorBuy, 0.88)
+          } else if (low < realizedPrices[index].value) {
+            data.cautiousRatio = 3
             data.color = mixColors(colors.black, colorBuy, 0.66)
-          } else if (!top && low < terminalPrice25[index].value) {
-            data.value = 1
-            data.color = mixColors(colors.black, colorBuy, 0.45)
-          } else if (!top && low < terminalPrice50[index].value) {
-            data.value = 1
-            data.color = mixColors(colors.black, colorBuy, 0.33)
+          } else if (!top && low < terminal25Prices[index].value) {
+            data.cautiousRatio = 2
+            data.color = mixColors(colors.black, colorBuy, 0.44)
+          } else if (!top && low < terminal50Prices[index].value) {
+            data.cautiousRatio = 1.5
+            data.color = mixColors(colors.black, colorBuy, 0.22)
+          } else if (!top && low < terminal75Prices[index].value) {
+            data.agressiveRatio = 1
+            data.color = mixColors(colors.black, colors.yellow, 0.22)
+          } else if (!top) {
+            data.agressiveRatio = -3
+            data.color = mixColors(colors.black, colors.amber, 0.33)
           } else if (top && close > top) {
-            data.value = 1
-            data.color = mixColors(colors.black, colorSell, 0.33)
-          } else if (top) {
-            data.value = 1
-            data.color = mixColors(colors.black, colorWait, 0.33)
+            data.agressiveRatio = -6
+            data.color = mixColors(colors.black, colors.orange, 0.44)
           } else {
-            data.value = 1
-            data.color = mixColors(colors.black, colorCaution, 0.33)
+            data.color = mixColors(colors.black, colors.emerald, 0.22)
           }
 
-          percentageRatio.push(data)
+          ratios.push(data)
         })
 
         setStore({
-          percentageRatio,
+          ratios,
         })
       })
     })

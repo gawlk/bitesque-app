@@ -52,13 +52,15 @@ export default (props: Props) => {
         })
 
         const priceLineOptions: LightweightCharts.PriceLineOptions = {
+          title: '',
           price: 0,
           color: 'transparent',
           lineVisible: true,
           lineWidth: 1,
           lineStyle: 3,
+          axisLabelColor: '',
+          axisLabelTextColor: '',
           axisLabelVisible: true,
-          title: '',
         }
 
         const priceLine = priceSeries.createPriceLine(priceLineOptions)
@@ -192,12 +194,12 @@ export default (props: Props) => {
             text: 'state.settings.price.type',
           }}
           title="Select a kind"
-          list={{
+          options={{
             selected: null,
-            values: [
+            list: [
               {
                 value: 'line',
-                label: 'Line',
+                text: 'Line',
                 icon: IconTablerChartLine,
               },
               {

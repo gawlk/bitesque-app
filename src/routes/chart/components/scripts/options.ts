@@ -1,11 +1,9 @@
+import { defaultChartLineOptions } from '/src/scripts'
+
 import { createAutoscaleInfoProvider } from '.'
 
-export const defaultLineOptions: LightweightCharts.DeepPartial<
-  LightweightCharts.LineStyleOptions & LightweightCharts.SeriesOptionsCommon
-> = {
-  lineWidth: 2,
-  priceLineVisible: false,
-  visible: false,
-  lastValueVisible: false,
-  autoscaleInfoProvider: createAutoscaleInfoProvider(),
-}
+export const defaultChartLineOptionsWithAutoscale: typeof defaultChartLineOptions =
+  {
+    ...defaultChartLineOptions,
+    autoscaleInfoProvider: createAutoscaleInfoProvider(),
+  }
